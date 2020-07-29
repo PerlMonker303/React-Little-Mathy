@@ -7,6 +7,7 @@ import {
   ENTITIES_OUTER_PADDING,
   ENTITIES_WIDTH,
   ENTITIES_HEIGHT,
+  COLLISION_DRAGGED,
 } from "../../properties";
 
 class Entity extends Component {
@@ -15,8 +16,8 @@ class Entity extends Component {
     this.state = {
       isDragged: false,
       coordinates: {
-        x: 200,
-        y: 200,
+        x: this.props.coordinates.x,
+        y: this.props.coordinates.y,
       },
       size: {
         width: ENTITIES_WIDTH,
@@ -59,7 +60,7 @@ class Entity extends Component {
         },
         zIndex: this.props.current_zIndex + ENTITIES_LIMIT,
       };
-    });
+    }, this.props.setSomethingIsDragged(true));
   };
 
   exitDrag = (event) => {
@@ -67,17 +68,23 @@ class Entity extends Component {
     //console.log("[Stopped drag]");
     const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
     const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
-    this.setState((prevState, props) => {
-      return {
-        ...prevState.state,
-        isDragged: false,
-        coordinates: {
-          x: currentX,
-          y: currentY,
-        },
-        zIndex: this.props.current_zIndex,
-      };
-    });
+    this.setState(
+      (prevProps, prevState) => {
+        return {
+          ...prevState.state,
+          isDragged: false,
+          coordinates: {
+            x: currentX,
+            y: currentY,
+          },
+          zIndex: this.props.current_zIndex,
+        };
+      },
+      () => {
+        this.props.collisionDetector(COLLISION_DRAGGED);
+        this.props.setSomethingIsDragged(false);
+      }
+    );
   };
 
   mouseMove = (event) => {
@@ -128,6 +135,7 @@ class Entity extends Component {
       height: this.state.size.height,
       marginTop: ENTITIES_OUTER_PADDING / 2,
       marginLeft: ENTITIES_OUTER_PADDING / 2,
+      opacity: this.props.isHighlighted ? 0.6 : 1,
     };
 
     const OuterStyle = this.state.isDragged
