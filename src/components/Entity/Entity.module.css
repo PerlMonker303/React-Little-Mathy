@@ -1,9 +1,10 @@
-.Entity {
-  width: 100px;
-  height: 100px;
-  z-index: inherit;
+.OuterEntity {
+  background-color: yellow;
 }
 
 .Entity {
+}
+
+.Entity:hover {
   cursor: pointer;
 }

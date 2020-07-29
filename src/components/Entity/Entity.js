@@ -2,6 +2,13 @@ import React, { Component } from "react";
 
 import styles from "./Entity.module.css";
 
+import {
+  ENTITIES_LIMIT,
+  ENTITIES_OUTER_PADDING,
+  ENTITIES_WIDTH,
+  ENTITIES_HEIGHT,
+} from "../../properties";
+
 class Entity extends Component {
   constructor(props) {
     super(props);
@@ -12,17 +19,36 @@ class Entity extends Component {
         y: 200,
       },
       size: {
-        width: 100,
-        height: 100,
+        width: ENTITIES_WIDTH,
+        height: ENTITIES_HEIGHT,
       },
       zIndex: this.props.current_zIndex,
     };
   }
+
+  // utility: calculate current coordinate
+  calculate_currentCoordinate = (type) => {
+    switch (type) {
+      case "X":
+        return (
+          this.state.coordinates.x -
+          (this.state.size.width + ENTITIES_OUTER_PADDING / 2) / 2
+        );
+      case "Y":
+        return (
+          this.state.coordinates.y -
+          (this.state.size.height + ENTITIES_OUTER_PADDING / 2) / 2
+        );
+      default:
+        return;
+    }
+  };
+
   enterDrag = (event) => {
     event.persist();
     //console.log("[Started drag]");
-    const currentX = this.props.mouse[0] - this.state.size.width / 2;
-    const currentY = this.props.mouse[1] - this.state.size.height / 2;
+    const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
+    const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
     this.setState((prevState, props) => {
       return {
         ...prevState.state,
@@ -31,7 +57,7 @@ class Entity extends Component {
           x: currentX,
           y: currentY,
         },
-        zIndex: this.props.current_zIndex + 1,
+        zIndex: this.props.current_zIndex + ENTITIES_LIMIT,
       };
     });
   };
@@ -39,8 +65,8 @@ class Entity extends Component {
   exitDrag = (event) => {
     event.persist();
     //console.log("[Stopped drag]");
-    const currentX = this.props.mouse[0] - this.state.size.width / 2;
-    const currentY = this.props.mouse[1] - this.state.size.height / 2;
+    const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
+    const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
     this.setState((prevState, props) => {
       return {
         ...prevState.state,
@@ -49,7 +75,7 @@ class Entity extends Component {
           x: currentX,
           y: currentY,
         },
-        zIndex: this.props.current_zIndex - 1,
+        zIndex: this.props.current_zIndex,
       };
     });
   };
@@ -57,8 +83,8 @@ class Entity extends Component {
   mouseMove = (event) => {
     event.persist();
     if (this.state.isDragged) {
-      const currentX = this.props.mouse[0] - this.state.size.width / 2;
-      const currentY = this.props.mouse[1] - this.state.size.height / 2;
+      const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
+      const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
       this.setState((prevState, props) => {
         return {
           ...prevState.state,
@@ -68,13 +94,15 @@ class Entity extends Component {
           },
         };
       });
+      this.props.coordinates.x = this.state.coordinates.x;
+      this.props.coordinates.y = this.state.coordinates.y;
     }
   };
 
   componentDidMount = (prevProps, prevState) => {
     console.log("HERE");
-    const currentX = this.props.mouse[0] - this.state.size.width / 2;
-    const currentY = this.props.mouse[1] - this.state.size.height / 2;
+    const currentX = this.calculate_currentCoordinate("X");
+    const currentY = this.calculate_currentCoordinate("Y");
     if (this.state.isDragged) {
       this.setState((prevState, props) => {
         return {
@@ -89,32 +117,50 @@ class Entity extends Component {
     //console.log("[DONE]" + currentX + "," + currentY);
   };
 
-  trigeredEvent = () => {
-    console.log("[TRIGGERED]");
-  };
-
   render() {
-    /* const currentX = this.props.mouse[0] - this.state.size.width / 2;
-    const currentY = this.props.mouse[1] - this.state.size.height / 2; */
-    const currentX = this.state.coordinates.x;
-    const currentY = this.state.coordinates.y;
+    const currentX = this.calculate_currentCoordinate("X");
+    const currentY = this.calculate_currentCoordinate("Y");
     //console.log("[CURRENT]" + currentX + "," + currentY);
-    const style = {
-      position: "absolute",
-      top: currentY,
-      left: currentX,
+    const InnerStyle = {
       backgroundColor: this.props.backgroundColor,
       zIndex: this.state.zIndex,
+      width: this.state.size.width,
+      height: this.state.size.height,
+      marginTop: ENTITIES_OUTER_PADDING / 2,
+      marginLeft: ENTITIES_OUTER_PADDING / 2,
     };
+
+    const OuterStyle = this.state.isDragged
+      ? {
+          position: "absolute",
+          top: currentY,
+          left: currentX,
+          zIndex: ENTITIES_LIMIT,
+          width: this.state.size.width + ENTITIES_OUTER_PADDING,
+          height: this.state.size.height + ENTITIES_OUTER_PADDING,
+        }
+      : {
+          position: "absolute",
+          top: currentY,
+          left: currentX,
+          width: 0,
+          height: 0,
+        };
 
     return (
       <div
-        className={styles.Entity}
-        style={style}
-        onMouseDownCapture={this.enterDrag}
-        onMouseUpCapture={this.exitDrag}
+        className={styles.OuterEntity}
+        style={OuterStyle}
+        onMouseDownCapture={this.state.isDragged ? this.enterDrag : null}
         onMouseMove={this.mouseMove}
-      ></div>
+      >
+        <div
+          className={styles.Entity}
+          style={InnerStyle}
+          onMouseDownCapture={this.enterDrag}
+          onMouseUpCapture={this.exitDrag}
+        ></div>
+      </div>
     );
   }
 }
