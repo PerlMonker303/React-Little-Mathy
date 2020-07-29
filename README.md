@@ -4,6 +4,7 @@
 <h3>Functionalities so far:</h3>
 <ul>
   <li>drag/drop entities</li>
+  <li>detect entity collisions</li>
 </ul>
 
 <h3>Non-functional requirements:</h3>
