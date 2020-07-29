@@ -8,7 +8,9 @@ import {
   ENTITIES_WIDTH,
   ENTITIES_HEIGHT,
   COLLISION_DRAGGED,
-} from "../../properties";
+} from "../../resources/properties";
+
+import { calculateCurrentCoordinate } from "../../backend/services/EntityService";
 
 class Entity extends Component {
   constructor(props) {
@@ -26,24 +28,6 @@ class Entity extends Component {
       zIndex: this.props.current_zIndex,
     };
   }
-
-  // utility: calculate current coordinate
-  calculate_currentCoordinate = (type) => {
-    switch (type) {
-      case "X":
-        return (
-          this.state.coordinates.x -
-          (this.state.size.width + ENTITIES_OUTER_PADDING / 2) / 2
-        );
-      case "Y":
-        return (
-          this.state.coordinates.y -
-          (this.state.size.height + ENTITIES_OUTER_PADDING / 2) / 2
-        );
-      default:
-        return;
-    }
-  };
 
   enterDrag = (event) => {
     event.persist();
@@ -106,28 +90,10 @@ class Entity extends Component {
     }
   };
 
-  componentDidMount = (prevProps, prevState) => {
-    console.log("HERE");
-    const currentX = this.calculate_currentCoordinate("X");
-    const currentY = this.calculate_currentCoordinate("Y");
-    if (this.state.isDragged) {
-      this.setState((prevState, props) => {
-        return {
-          ...prevState.state,
-          coordinates: {
-            x: currentX,
-            y: currentY,
-          },
-        };
-      });
-    }
-    //console.log("[DONE]" + currentX + "," + currentY);
-  };
-
   render() {
-    const currentX = this.calculate_currentCoordinate("X");
-    const currentY = this.calculate_currentCoordinate("Y");
-    //console.log("[CURRENT]" + currentX + "," + currentY);
+    const currentX = calculateCurrentCoordinate(this.state, "X");
+    const currentY = calculateCurrentCoordinate(this.state, "Y");
+
     const InnerStyle = {
       backgroundColor: this.props.backgroundColor,
       zIndex: this.state.zIndex,
@@ -167,7 +133,12 @@ class Entity extends Component {
           style={InnerStyle}
           onMouseDownCapture={this.enterDrag}
           onMouseUpCapture={this.exitDrag}
-        ></div>
+        >
+          <img
+            src={require("../../resources/icons/" + this.props.icon)}
+            alt={this.props.icon}
+          />
+        </div>
       </div>
     );
   }

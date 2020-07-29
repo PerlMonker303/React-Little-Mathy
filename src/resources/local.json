@@ -1,0 +1,22 @@
+{
+  "entities": [
+    {
+      "id": 1,
+      "name": "point",
+      "icon": "point_ico.svg",
+      "backgroundColor": "red"
+    },
+    {
+      "id": 2,
+      "name": "segment",
+      "icon": "segment_ico.svg",
+      "backgroundColor": "green"
+    },
+    {
+      "id": 3,
+      "name": "triangle",
+      "icon": "segment_ico.svg",
+      "backgroundColor": "blue"
+    }
+  ]
+}

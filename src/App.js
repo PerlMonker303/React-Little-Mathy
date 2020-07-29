@@ -2,13 +2,17 @@ import React, { Component } from "react";
 import Entity from "./components/Entity/Entity";
 
 import styles from "./App.module.css";
-import { render } from "@testing-library/react";
+
 import {
   ENTITIES_WIDTH,
   ENTITIES_HEIGHT,
   COLLISION_CHECK,
   COLLISION_DRAGGED,
-} from "./properties";
+} from "./resources/properties";
+
+import { combineEntities } from "./backend/services/EntityService";
+
+import Data from "./resources/local.json";
 
 class App extends Component {
   constructor(props) {
@@ -16,7 +20,18 @@ class App extends Component {
     this.state = {
       mouse: [0, 0],
       current_zIndex: 100,
-      entities: [
+      entities: Data.entities.map((entity) => {
+        console.log(entity);
+        return {
+          id: entity.id,
+          backgroundColor: entity.backgroundColor,
+          coordinates: { x: entity.id * 100, y: entity.id * 100 },
+          isHighlighted: false,
+          icon: entity.icon,
+        };
+      }),
+      somethingIsDragged: false,
+      /* [
         {
           id: 1,
           backgroundColor: "red",
@@ -35,8 +50,7 @@ class App extends Component {
           coordinates: { x: 150, y: 180 },
           isHighlighted: false,
         },
-      ],
-      somethingIsDragged: false,
+      ], */
     };
   }
 
@@ -78,25 +92,27 @@ class App extends Component {
         ) {
           if (type === COLLISION_CHECK) {
             console.log("CHECKING");
+            console.log(
+              "[" +
+                entity1.id +
+                "] " +
+                entity1.coordinates.x +
+                ":" +
+                entity1.coordinates.y
+            );
+            console.log(
+              "[" +
+                entity2.id +
+                "] " +
+                entity2.coordinates.x +
+                ":" +
+                entity2.coordinates.y
+            );
           } else if (type === COLLISION_DRAGGED) {
             console.log("DRAGGED");
+            combineEntities(this.state.entities, entity1, entity2);
           }
-          console.log(
-            "[" +
-              entity1.id +
-              "] " +
-              entity1.coordinates.x +
-              ":" +
-              entity1.coordinates.y
-          );
-          console.log(
-            "[" +
-              entity2.id +
-              "] " +
-              entity2.coordinates.x +
-              ":" +
-              entity2.coordinates.y
-          );
+
           entity1.isHighlighted = true;
           entity2.isHighlighted = true;
           return;
@@ -129,6 +145,7 @@ class App extends Component {
               collisionDetector={this.collisionDetector}
               setSomethingIsDragged={this.setSomethingIsDragged}
               isHighlighted={entity.isHighlighted}
+              icon={entity.icon}
             />
           );
         })}
