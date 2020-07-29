@@ -1,5 +1,9 @@
 .OuterEntity {
+<<<<<<< HEAD
   /* background-color: yellow; only for debugging*/
+=======
+  /*background-color: yellow; only for debugging*/
+>>>>>>> f931c6a2dac7a44a87db0fb9fe3a3ea83871993a
 }
 
 .Entity {
