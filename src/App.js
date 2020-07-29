@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import Entity from "./components/Entity/Entity";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import styles from "./App.module.css";
+import { render } from "@testing-library/react";
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mouse: [0, 0],
+      current_zIndex: 100,
+      entities: [
+        { id: 1, backgroundColor: "red" },
+        { id: 2, backgroundColor: "green" },
+        { id: 3, backgroundColor: "blue" },
+      ],
+    };
+  }
+
+  mouseMoveHandler = (event) => {
+    this.setState({ mouse: [event.clientX, event.clientY] });
+  };
+  /* 
+  increment_zIndex = () => {
+    this.setState((prevProps, prevState) => {
+      return {
+        ...prevState,
+        current_zIndex: prevState.current_zIndex + 1,
+      };
+    });
+  }; */
+
+  render() {
+    return (
+      <div className={styles.App} onMouseMove={this.mouseMoveHandler}>
+        {this.state.entities.map((entity, index) => {
+          return (
+            <Entity
+              key={entity.id}
+              mouse={this.state.mouse}
+              backgroundColor={entity.backgroundColor}
+              current_zIndex={this.state.current_zIndex + index}
+            />
+          );
+        })}
+      </div>
+    );
+  }
 }
 
 export default App;

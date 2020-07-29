@@ -1,0 +1,9 @@
+.Entity {
+  width: 100px;
+  height: 100px;
+  z-index: inherit;
+}
+
+.Entity {
+  cursor: pointer;
+}
