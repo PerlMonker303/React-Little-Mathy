@@ -1,0 +1,20 @@
+.Menu {
+  background-color: darkred;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 150px;
+  height: 100%;
+}
+
+@media (max-width: 700px) {
+  .Menu {
+    width: 120px;
+  }
+}
+
+@media (max-width: 380px) {
+  .Menu {
+    width: 100px;
+  }
+}

@@ -34,7 +34,7 @@ class Entity extends Component {
     //console.log("[Started drag]");
     const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
     const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
-    this.setState((prevState, props) => {
+    this.setState((prevProps, prevState) => {
       return {
         ...prevState.state,
         isDragged: true,
@@ -76,7 +76,7 @@ class Entity extends Component {
     if (this.state.isDragged) {
       const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
       const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
-      this.setState((prevState, props) => {
+      this.setState((prevProps, prevState) => {
         return {
           ...prevState.state,
           coordinates: {
@@ -137,6 +137,7 @@ class Entity extends Component {
           <img
             src={require("../../resources/icons/" + this.props.icon)}
             alt={this.props.icon}
+            draggable={false}
           />
         </div>
       </div>

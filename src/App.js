@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Entity from "./components/Entity/Entity";
+import Menu from "./components/Menu/Menu";
 
 import styles from "./App.module.css";
 
@@ -10,49 +11,37 @@ import {
   COLLISION_DRAGGED,
 } from "./resources/properties";
 
-import { combineEntities } from "./backend/services/EntityService";
+import {
+  createEntity,
+  combineEntities,
+} from "./backend/services/EntityService";
 
 import Data from "./resources/local.json";
 
 class App extends Component {
   constructor(props) {
     super(props);
+    const entities = this.setEntities();
     this.state = {
       mouse: [0, 0],
       current_zIndex: 100,
-      entities: Data.entities.map((entity) => {
-        console.log(entity);
-        return {
-          id: entity.id,
-          backgroundColor: entity.backgroundColor,
-          coordinates: { x: entity.id * 100, y: entity.id * 100 },
-          isHighlighted: false,
-          icon: entity.icon,
-        };
-      }),
+      entities: entities,
       somethingIsDragged: false,
-      /* [
-        {
-          id: 1,
-          backgroundColor: "red",
-          coordinates: { x: 30, y: 50 },
-          isHighlighted: false,
-        },
-        {
-          id: 2,
-          backgroundColor: "green",
-          coordinates: { x: 100, y: 120 },
-          isHighlighted: false,
-        },
-        {
-          id: 3,
-          backgroundColor: "blue",
-          coordinates: { x: 150, y: 180 },
-          isHighlighted: false,
-        },
-      ], */
+      currentKey: entities.length,
+      isPlacingEntityFromMenu: false,
     };
   }
+
+  setEntities = () => {
+    let keyValue = 0;
+    let newEntities = Data.entities.map((entity) => {
+      let createdEntity = createEntity(entity, keyValue);
+      keyValue++;
+      return createdEntity;
+    });
+
+    return newEntities;
+  };
 
   mouseMoveHandler = (event) => {
     this.setState({ mouse: [event.clientX, event.clientY] });
@@ -60,9 +49,11 @@ class App extends Component {
 
   collisionDetector = (type) => {
     /*type: 
-    -COLLISION_CHECK - just checks for collisions, used to change color on collision items
+    -COLLISION_CHECK - just checks for collisions, used to show collision on overlapping items
     -COLLISION_DRAGGED - take action for overlapping elements
     */
+    //first check if collision is made with menu - TO DO
+
     for (let i = 0; i < this.state.entities.length; i++) {
       for (let j = i + 1; j < this.state.entities.length; j++) {
         const entity1 = this.state.entities[i];
@@ -91,7 +82,7 @@ class App extends Component {
               entity1.coordinates.y)
         ) {
           if (type === COLLISION_CHECK) {
-            console.log("CHECKING");
+            /* console.log("CHECKING");
             console.log(
               "[" +
                 entity1.id +
@@ -107,10 +98,15 @@ class App extends Component {
                 entity2.coordinates.x +
                 ":" +
                 entity2.coordinates.y
-            );
+            ); */
           } else if (type === COLLISION_DRAGGED) {
             console.log("DRAGGED");
-            combineEntities(this.state.entities, entity1, entity2);
+            combineEntities(
+              this.state.entities,
+              entity1,
+              entity2,
+              this.state.currentKey
+            );
           }
 
           entity1.isHighlighted = true;
@@ -127,17 +123,42 @@ class App extends Component {
     });
   };
 
+  showEntityFromMenu = (entityId) => {
+    console.log("SHOWING ENTITY WITH ID " + entityId);
+  };
+
+  mouseUpHandler = (event) => {
+    console.log("PLACED FROM MENU");
+    this.setIsPlacingEntityFromMenu(false);
+  };
+
+  setIsPlacingEntityFromMenu = (set) => {
+    this.setState((prevProps, prevState) => {
+      return { ...prevState, isPlacingEntityFromMenu: set };
+    });
+  };
+
   render() {
     if (this.state.somethingIsDragged) {
       this.collisionDetector(COLLISION_CHECK);
     }
 
     return (
-      <div className={styles.App} onMouseMove={this.mouseMoveHandler}>
+      <div
+        className={styles.App}
+        onMouseMove={this.mouseMoveHandler}
+        onMouseUpCapture={this.mouseUpHandler}
+      >
+        <Menu
+          mouse={this.state.mouse}
+          showEntityFromMenu={this.showEntityFromMenu}
+          setIsPlacingEntityFromMenu={this.setIsPlacingEntityFromMenu}
+          getIsPlacingEntityFromMenu={() => this.state.isPlacingEntityFromMenu}
+        />
         {this.state.entities.map((entity, index) => {
           return (
             <Entity
-              key={entity.id}
+              key={entity.key}
               mouse={this.state.mouse}
               backgroundColor={entity.backgroundColor}
               current_zIndex={this.state.current_zIndex + index}

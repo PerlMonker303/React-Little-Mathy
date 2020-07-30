@@ -4,19 +4,29 @@
       "id": 1,
       "name": "point",
       "icon": "point_ico.svg",
-      "backgroundColor": "red"
+      "backgroundColor": "redd",
+      "parents": [null, null]
     },
     {
       "id": 2,
       "name": "segment",
       "icon": "segment_ico.svg",
-      "backgroundColor": "green"
+      "backgroundColor": "greend",
+      "parents": [1, 1]
     },
     {
       "id": 3,
-      "name": "triangle",
-      "icon": "segment_ico.svg",
-      "backgroundColor": "blue"
+      "name": "line",
+      "icon": "line_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [1, 1]
+    },
+    {
+      "id": 4,
+      "name": "angle",
+      "icon": "angle_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [1, 2]
     }
   ]
 }
