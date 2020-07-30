@@ -13,13 +13,14 @@ import {
 class MenuEntity extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { id: this.props.id };
   }
 
   enterDrag = (event) => {
     event.persist();
     console.log("[Started drag MENU]");
     this.props.setIsDragging(true);
+    this.props.setWhatIsDragging(this);
   };
 
   exitDrag = (event) => {

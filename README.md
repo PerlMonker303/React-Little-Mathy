@@ -6,9 +6,5 @@
   <li>drag/drop entities</li>
   <li>detect entity collisions</li>
   <li>combine entities</li>
-</ul>
-
-<h3>Non-functional requirements:</h3>
-<ul>
-  <li>mobile friendly</li>
+  <li>detect collisions with the menu</li>
 </ul>

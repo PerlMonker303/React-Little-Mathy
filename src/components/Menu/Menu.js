@@ -39,10 +39,21 @@ class Menu extends Component {
       this.props.getIsPlacingEntityFromMenu()
     );
     if (this.props.getIsPlacingEntityFromMenu()) {
-      this.props.showEntityFromMenu(0);
       this.props.setIsPlacingEntityFromMenu(true);
+      for (let i = 0; i < this.state.entities.length; i++) {
+        if (this.state.entities[i].isDragging === true) {
+          this.props.showEntityFromMenu(this.state.entities[i].id);
+          break;
+        }
+      }
     }
   };
+
+  setWhatIsDragging = (entity) => {
+    console.log("DRAGGING ENTITY ", entity.state.id);
+    this.props.setWhatIsDraggedFromMenu(entity.state.id);
+  };
+
   render() {
     return (
       <div
@@ -54,9 +65,12 @@ class Menu extends Component {
         {this.state.entities.map((entity) => {
           return (
             <MenuEntity
+              key={entity.id}
+              id={entity.id}
               entity={entity}
               mouse={this.props.mouse}
               setIsDragging={this.props.setIsPlacingEntityFromMenu}
+              setWhatIsDragging={this.setWhatIsDragging}
             />
           );
         })}

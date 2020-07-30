@@ -1,16 +1,39 @@
 import { ENTITIES_OUTER_PADDING } from "../../resources/properties";
 import Data from "../../resources/local.json";
 
-export const createEntity = (baseEntity, keyValue) => {
-  console.log("CREATING", baseEntity.id);
+export const createEntity = (baseEntity, keyValue, posX, posY) => {
   return {
     id: baseEntity.id,
     key: keyValue,
     backgroundColor: baseEntity.backgroundColor,
-    coordinates: { x: baseEntity.id * 50, y: baseEntity.id * 50 },
+    coordinates: {
+      x: posX - ENTITIES_OUTER_PADDING / 4, //WORK HERE
+      y: posY - ENTITIES_OUTER_PADDING / 4,
+    },
     isHighlighted: false,
     icon: baseEntity.icon,
   };
+};
+
+export const deleteEntity = (entities, entity) => {
+  let idx = -1;
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].id === entity.state.id) {
+      idx = i;
+      break;
+    }
+  }
+  console.log("DELETE: ", entities[idx]);
+  entities.splice(idx, 1);
+};
+
+export const getEntityBasedOnId = (entities, id) => {
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].id === id) {
+      return entities[i];
+    }
+  }
+  return null;
 };
 
 export const combineEntities = (entities, entity1, entity2, keyValue) => {

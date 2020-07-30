@@ -16,6 +16,7 @@ class Entity extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: this.props.id,
       isDragged: false,
       coordinates: {
         x: this.props.coordinates.x,
@@ -34,17 +35,23 @@ class Entity extends Component {
     //console.log("[Started drag]");
     const currentX = this.props.mouse[0] - ENTITIES_OUTER_PADDING / 4;
     const currentY = this.props.mouse[1] - ENTITIES_OUTER_PADDING / 4;
-    this.setState((prevProps, prevState) => {
-      return {
-        ...prevState.state,
-        isDragged: true,
-        coordinates: {
-          x: currentX,
-          y: currentY,
-        },
-        zIndex: this.props.current_zIndex + ENTITIES_LIMIT,
-      };
-    }, this.props.setSomethingIsDragged(true));
+    this.setState(
+      (prevProps, prevState) => {
+        return {
+          ...prevState.state,
+          isDragged: true,
+          coordinates: {
+            x: currentX,
+            y: currentY,
+          },
+          zIndex: this.props.current_zIndex + ENTITIES_LIMIT,
+        };
+      },
+      () => {
+        this.props.setSomethingIsDragged(true);
+        this.props.setWhatIsDragged(this);
+      }
+    );
   };
 
   exitDrag = (event) => {

@@ -6,3 +6,5 @@ export const ENTITIES_HEIGHT = 50; // entity height
 //COLLISION DETECTION LABELS
 export const COLLISION_CHECK = "collision_check";
 export const COLLISION_DRAGGED = "collision_dragged";
+export const COLLISION_MENU = "collision_menu";
+export const COLLISION_OVER_MENU = "collision_over_menu";
