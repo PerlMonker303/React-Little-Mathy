@@ -1,13 +1,14 @@
 import { ENTITIES_OUTER_PADDING } from "../../resources/properties";
 import Data from "../../resources/local.json";
+import { discoverEntity } from "../localDataUtils";
 
 export const createEntity = (baseEntity, keyValue, posX, posY) => {
   return {
     id: baseEntity.id,
-    key: keyValue,
+    keyValue: keyValue,
     backgroundColor: baseEntity.backgroundColor,
     coordinates: {
-      x: posX - ENTITIES_OUTER_PADDING / 4, //WORK HERE
+      x: posX - ENTITIES_OUTER_PADDING / 4,
       y: posY - ENTITIES_OUTER_PADDING / 4,
     },
     isHighlighted: false,
@@ -16,14 +17,17 @@ export const createEntity = (baseEntity, keyValue, posX, posY) => {
 };
 
 export const deleteEntity = (entities, entity) => {
+  //based on keys, not ids
   let idx = -1;
   for (let i = 0; i < entities.length; i++) {
-    if (entities[i].id === entity.state.id) {
+    if (
+      entities[i].id === entity.state.id &&
+      entities[i].keyValue === entity.props.keyValue
+    ) {
       idx = i;
       break;
     }
   }
-  console.log("DELETE: ", entities[idx]);
   entities.splice(idx, 1);
 };
 
@@ -61,9 +65,25 @@ export const combineEntities = (entities, entity1, entity2, keyValue) => {
     adaptedEntity.coordinates = coordOfEntity1;
     copy_entities.push(adaptedEntity);
 
+    //discover it
+    discoverNewEntity(adaptedEntity.id);
+
     return true;
   }
   return false;
+};
+
+const discoverNewEntity = (newEntityId) => {
+  for (let i = 0; i < Data.entities.length; i++) {
+    if (
+      Data.entities[i].id === newEntityId &&
+      Data.entities[i].discovered === false
+    ) {
+      console.log("DISCOVERED ", JSON.stringify(Data.entities[i]));
+      discoverEntity(i);
+      return;
+    }
+  }
 };
 
 // utility: calculate current coordinate

@@ -5,28 +5,32 @@
       "name": "point",
       "icon": "point_ico.svg",
       "backgroundColor": "redd",
-      "parents": [null, null]
+      "parents": [null, null],
+      "discovered": true
     },
     {
       "id": 2,
       "name": "segment",
       "icon": "segment_ico.svg",
       "backgroundColor": "greend",
-      "parents": [1, 1]
+      "parents": [1, 1],
+      "discovered": true
     },
     {
       "id": 3,
       "name": "line",
       "icon": "line_ico.svg",
       "backgroundColor": "blued",
-      "parents": [1, 1]
+      "parents": [1, 1],
+      "discovered": true
     },
     {
       "id": 4,
       "name": "angle",
       "icon": "angle_ico.svg",
       "backgroundColor": "blued",
-      "parents": [1, 2]
+      "parents": [1, 2],
+      "discovered": false
     }
   ]
 }

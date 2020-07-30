@@ -17,7 +17,7 @@ class Entity extends Component {
     super(props);
     this.state = {
       id: this.props.id,
-      isDragged: false,
+      isDragged: this.props.setCurrentPreviewPos ? true : false,
       coordinates: {
         x: this.props.coordinates.x,
         y: this.props.coordinates.y,
@@ -27,6 +27,7 @@ class Entity extends Component {
         height: ENTITIES_HEIGHT,
       },
       zIndex: this.props.current_zIndex,
+      keyValue: this.props.keyValue,
     };
   }
 
@@ -45,6 +46,7 @@ class Entity extends Component {
             y: currentY,
           },
           zIndex: this.props.current_zIndex + ENTITIES_LIMIT,
+          keyValue: this.props.keyValue,
         };
       },
       () => {
@@ -74,6 +76,7 @@ class Entity extends Component {
       () => {
         this.props.collisionDetector(COLLISION_DRAGGED);
         this.props.setSomethingIsDragged(false);
+        this.props.setWhatIsDragged(null);
       }
     );
   };

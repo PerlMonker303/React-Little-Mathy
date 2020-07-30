@@ -26,30 +26,29 @@ import Data from "./resources/local.json";
 class App extends Component {
   constructor(props) {
     super(props);
-    const entities = this.setEntities();
     this.state = {
+      apiResponse: "",
       mouse: [0, 0],
       current_zIndex: 100,
-      entities: entities,
+      entities: [],
       somethingIsDragged: false,
       whatIsDragged: null,
       whatIsDraggedFromMenu: null,
-      currentKey: entities.length,
+      currentKey: 0,
       isPlacingEntityFromMenu: false,
       isOverMenu: false,
+      previewEntity: null,
     };
   }
 
-  setEntities = () => {
-    return []; //dont set any inital entities
-    let keyValue = 0;
-    let newEntities = Data.entities.map((entity) => {
-      let createdEntity = createEntity(entity, keyValue);
-      keyValue++;
-      return createdEntity;
-    });
+  callAPI = () => {
+    fetch("http://localhost:9000/testAPI")
+      .then((res) => res.text())
+      .then((res) => this.setState({ apiResponse: res }));
+  };
 
-    return newEntities;
+  componentDidMount = () => {
+    this.callAPI();
   };
 
   incrementCurrentKey = () => {
@@ -72,7 +71,14 @@ class App extends Component {
   };
 
   mouseMoveHandler = (event) => {
-    this.setState({ mouse: [event.clientX, event.clientY] });
+    const newPreviewEntity = this.state.previewEntity;
+    if (newPreviewEntity != null) {
+      newPreviewEntity.coordinates = { x: event.clientX, y: event.clientY };
+    }
+    this.setState({
+      mouse: [event.clientX, event.clientY],
+      previewEntity: newPreviewEntity,
+    });
   };
 
   collisionDetector = (type) => {
@@ -106,7 +112,6 @@ class App extends Component {
         entity2.isHighlighted = false;
 
         //code for collision
-
         if (
           (entity1.coordinates.x <=
             entity2.coordinates.x + ENTITIES_WIDTH / 2 &&
@@ -126,23 +131,8 @@ class App extends Component {
               entity1.coordinates.y)
         ) {
           if (type === COLLISION_CHECK) {
-            /* console.log("CHECKING");
-            console.log(
-              "[" +
-                entity1.id +
-                "] " +
-                entity1.coordinates.x +
-                ":" +
-                entity1.coordinates.y
-            );
-            console.log(
-              "[" +
-                entity2.id +
-                "] " +
-                entity2.coordinates.x +
-                ":" +
-                entity2.coordinates.y
-            ); */
+            /* console.log("CHECKING"); console.log("[" + entity1.id + "] " + entity1.coordinates.x + ":" + entity1.coordinates.y); console.log(
+              "[" + entity2.id + "] " + entity2.coordinates.x + ":" +  entity2.coordinates.y ); */
           } else if (type === COLLISION_DRAGGED) {
             console.log("DRAGGED");
             combineEntities(
@@ -180,17 +170,53 @@ class App extends Component {
   };
 
   showEntityFromMenu = (entityId) => {
-    console.log("SHOWING ENTITY WITH ID " + entityId);
+    let idx = -1;
+    for (let i = 0; i < Data.entities.length; i++) {
+      if (Data.entities[i].id === this.state.whatIsDraggedFromMenu) {
+        idx = i;
+        break;
+      }
+    }
+
+    const baseEntity = Data.entities[idx];
+    const newEntity = createEntity(
+      baseEntity,
+      this.state.currentKey,
+      this.state.mouse[0],
+      this.state.mouse[1]
+    );
+
+    this.setState((prevProps, prevState) => {
+      return {
+        ...prevState,
+        previewEntity: newEntity,
+      };
+    });
   };
 
   mouseUpHandler = (event) => {
     if (
       this.state.isPlacingEntityFromMenu === false &&
+      this.state.somethingIsDragged &&
       this.collisionDetector(COLLISION_MENU) === COLLISION_OVER_MENU
     ) {
-      console.log("PLACED TO MENU");
+      console.log("PLACED TO MENU - ", this.state.whatIsDragged);
       deleteEntity(this.state.entities, this.state.whatIsDragged);
-    } else if (!this.state.somethingIsDragged) {
+    } else if (
+      this.state.isPlacingEntityFromMenu &&
+      !this.state.somethingIsDragged
+    ) {
+      if (this.collisionDetector(COLLISION_MENU) === COLLISION_OVER_MENU) {
+        this.setState((prevProps, prevState) => {
+          return {
+            ...prevState,
+            whatIsDraggedFromMenu: null,
+            isPlacingEntityFromMenu: null,
+            previewEntity: null,
+          };
+        });
+        return;
+      }
       console.log("PLACED FROM MENU");
       this.setIsPlacingEntityFromMenu(false);
       let idx = -1;
@@ -209,16 +235,12 @@ class App extends Component {
       );
       this.incrementCurrentKey();
 
-      console.log("COORDS: ", newEntity.coordinates);
-      console.log("MOUSE COORDS:", this.state.mouse);
-
       const newEntities = this.state.entities;
       newEntities.push(newEntity);
 
-      console.log("NEW ENTITY: ", newEntity);
       this.setState((prevProps, prevState) => {
-        return { ...prevState, entities: newEntities };
-      });
+        return { ...prevState, entities: newEntities, previewEntity: null };
+      }, this.collisionDetector(COLLISION_DRAGGED));
     }
   };
 
@@ -247,10 +269,24 @@ class App extends Component {
           getIsPlacingEntityFromMenu={() => this.state.isPlacingEntityFromMenu}
           setWhatIsDraggedFromMenu={this.setWhatIsDraggedFromMenu}
         />
+        {this.state.previewEntity ? (
+          <Entity
+            id={this.state.previewEntity.id}
+            mouse={this.state.mouse}
+            current_zIndex={1000}
+            coordinates={{ x: this.state.mouse[0], y: this.state.mouse[1] }}
+            collisionDetector={this.collisionDetector}
+            setSomethingIsDragged={this.setSomethingIsDragged}
+            setWhatIsDragged={this.setWhatIsDragged}
+            icon={this.state.previewEntity.icon}
+            setCurrentPreviewPos
+          />
+        ) : null}
         {this.state.entities.map((entity, index) => {
           return (
             <Entity
-              key={entity.key}
+              key={entity.keyValue}
+              keyValue={entity.keyValue}
               id={entity.id}
               mouse={this.state.mouse}
               backgroundColor={entity.backgroundColor}

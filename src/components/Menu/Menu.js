@@ -8,15 +8,28 @@ class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      entities: Data.entities,
+      entities: this.getDiscoveredEntities(),
+      isDragging: -1, //id of what is dragged, -1 for nothing
     };
   }
+
+  getDiscoveredEntities = () => {
+    let discoveredEntities = [];
+    Data.entities.forEach((entity) => {
+      if (entity.discovered) {
+        discoveredEntities.push(entity);
+      }
+    });
+    return discoveredEntities;
+  };
+
   mouseMoveHandler = (event) => {
-    console.log(
+    /* console.log(
       "[MOUSE MOVED MENU] dragging:",
       this.props.getIsPlacingEntityFromMenu()
-    );
+    ); */
   };
+
   setIsDragging = (set) => {
     this.setState((prevProps, prevState) => {
       return {
@@ -25,32 +38,25 @@ class Menu extends Component {
       };
     });
   };
+
   mouseUpHandler = (event) => {
-    console.log(
+    /* console.log(
       "[MOUSE UP MENU] dragging:",
       this.props.getIsPlacingEntityFromMenu()
-    );
-    this.setIsDragging(false);
+    ); */
+    this.setIsDragging(-1);
     this.props.setIsPlacingEntityFromMenu(false);
   };
+
   mouseOutHandler = (event) => {
-    console.log(
-      "[MOUSE OUT MENU] dragging:",
-      this.props.getIsPlacingEntityFromMenu()
-    );
     if (this.props.getIsPlacingEntityFromMenu()) {
       this.props.setIsPlacingEntityFromMenu(true);
-      for (let i = 0; i < this.state.entities.length; i++) {
-        if (this.state.entities[i].isDragging === true) {
-          this.props.showEntityFromMenu(this.state.entities[i].id);
-          break;
-        }
-      }
+      this.props.showEntityFromMenu(this.state.isDragging);
     }
   };
 
   setWhatIsDragging = (entity) => {
-    console.log("DRAGGING ENTITY ", entity.state.id);
+    this.setIsDragging(entity.state.id);
     this.props.setWhatIsDraggedFromMenu(entity.state.id);
   };
 

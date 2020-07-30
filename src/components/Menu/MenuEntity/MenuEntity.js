@@ -18,14 +18,12 @@ class MenuEntity extends Component {
 
   enterDrag = (event) => {
     event.persist();
-    console.log("[Started drag MENU]");
     this.props.setIsDragging(true);
     this.props.setWhatIsDragging(this);
   };
 
   exitDrag = (event) => {
     event.persist();
-    console.log("[Stopped drag MENU - ON ELEMENT]");
     this.props.setIsDragging(false);
   };
 
