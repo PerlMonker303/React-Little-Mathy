@@ -2,14 +2,6 @@ import React, { Component } from "react";
 
 import styles from "./MenuEntity.module.css";
 
-import {
-  ENTITIES_LIMIT,
-  ENTITIES_OUTER_PADDING,
-  ENTITIES_WIDTH,
-  ENTITIES_HEIGHT,
-  COLLISION_DRAGGED,
-} from "../../../resources/properties";
-
 class MenuEntity extends Component {
   constructor(props) {
     super(props);

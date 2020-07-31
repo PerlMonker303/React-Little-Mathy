@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 
 import styles from "./Menu.module.css";
-import Data from "../../resources/local.json";
 import MenuEntity from "./MenuEntity/MenuEntity";
+import EntitiesRepository from "../../backend/repositories/EntitiesRepository";
 
 class Menu extends Component {
   constructor(props) {
     super(props);
+    this.entitiesRepository = new EntitiesRepository();
     this.state = {
       entities: this.getDiscoveredEntities(),
       isDragging: -1, //id of what is dragged, -1 for nothing
@@ -15,7 +16,8 @@ class Menu extends Component {
 
   getDiscoveredEntities = () => {
     let discoveredEntities = [];
-    Data.entities.forEach((entity) => {
+    const entities = this.entitiesRepository.getData();
+    entities.forEach((entity) => {
       if (entity.discovered) {
         discoveredEntities.push(entity);
       }

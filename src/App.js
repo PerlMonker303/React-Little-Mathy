@@ -12,20 +12,21 @@ import {
   COLLISION_DRAGGED,
   COLLISION_MENU,
   COLLISION_OVER_MENU,
+  COLLISION_REPULSION_OFFSET,
 } from "./resources/properties";
 
 import {
   createEntity,
   deleteEntity,
-  getEntityBasedOnId,
   combineEntities,
 } from "./backend/services/EntityService";
 
-import Data from "./resources/local.json";
+import EntitiesRepository from "./backend/repositories/EntitiesRepository";
 
 class App extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       apiResponse: "",
       mouse: [0, 0],
@@ -39,20 +40,12 @@ class App extends Component {
       isOverMenu: false,
       previewEntity: null,
     };
+
+    this.entitiesRepository = new EntitiesRepository();
   }
 
-  callAPI = () => {
-    fetch("http://localhost:9000/testAPI")
-      .then((res) => res.text())
-      .then((res) => this.setState({ apiResponse: res }));
-  };
-
-  componentDidMount = () => {
-    this.callAPI();
-  };
-
-  incrementCurrentKey = () => {
-    let newCurrentKey = this.state.currentKey + 1;
+  incrementCurrentKey = (incrementFactor) => {
+    let newCurrentKey = this.state.currentKey + incrementFactor;
     this.setState((prevProps, prevState) => {
       return {
         ...prevState,
@@ -134,13 +127,33 @@ class App extends Component {
             /* console.log("CHECKING"); console.log("[" + entity1.id + "] " + entity1.coordinates.x + ":" + entity1.coordinates.y); console.log(
               "[" + entity2.id + "] " + entity2.coordinates.x + ":" +  entity2.coordinates.y ); */
           } else if (type === COLLISION_DRAGGED) {
-            console.log("DRAGGED");
-            combineEntities(
+            const obtainedChildrenCount = combineEntities(
               this.state.entities,
               entity1,
               entity2,
               this.state.currentKey
             );
+            if (obtainedChildrenCount > 0) {
+              this.incrementCurrentKey(obtainedChildrenCount);
+              this.collisionDetector(COLLISION_CHECK);
+            } else {
+              //reject the entities - FIX
+              /* entity1.coordinates.x += COLLISION_REPULSION_OFFSET;
+              entity1.coordinates.y += COLLISION_REPULSION_OFFSET;
+              entity2.coordinates.x -= COLLISION_REPULSION_OFFSET;
+              entity2.coordinates.y -= COLLISION_REPULSION_OFFSET;
+              entity1.reference.current.updateCoordinates(
+                COLLISION_REPULSION_OFFSET,
+                COLLISION_REPULSION_OFFSET
+              );
+              entity2.reference.current.updateCoordinates(
+                -COLLISION_REPULSION_OFFSET,
+                -COLLISION_REPULSION_OFFSET
+              );
+              entity1.isHighlighted = false;
+              entity2.isHighlighted = false; 
+              this.collisionDetector(COLLISION_CHECK);*/
+            }
           }
 
           entity1.isHighlighted = true;
@@ -171,14 +184,15 @@ class App extends Component {
 
   showEntityFromMenu = (entityId) => {
     let idx = -1;
-    for (let i = 0; i < Data.entities.length; i++) {
-      if (Data.entities[i].id === this.state.whatIsDraggedFromMenu) {
+    const entities = this.entitiesRepository.getData();
+    for (let i = 0; i < entities.length; i++) {
+      if (entities[i].id === this.state.whatIsDraggedFromMenu) {
         idx = i;
         break;
       }
     }
 
-    const baseEntity = Data.entities[idx];
+    const baseEntity = entities[idx];
     const newEntity = createEntity(
       baseEntity,
       this.state.currentKey,
@@ -219,21 +233,22 @@ class App extends Component {
       }
       console.log("PLACED FROM MENU");
       this.setIsPlacingEntityFromMenu(false);
+      const entities = this.entitiesRepository.getData();
       let idx = -1;
-      for (let i = 0; i < Data.entities.length; i++) {
-        if (Data.entities[i].id === this.state.whatIsDraggedFromMenu) {
+      for (let i = 0; i < entities.length; i++) {
+        if (entities[i].id === this.state.whatIsDraggedFromMenu) {
           idx = i;
           break;
         }
       }
-      const baseEntity = Data.entities[idx];
+      const baseEntity = entities[idx];
       const newEntity = createEntity(
         baseEntity,
         this.state.currentKey,
         this.state.mouse[0],
         this.state.mouse[1]
       );
-      this.incrementCurrentKey();
+      this.incrementCurrentKey(1);
 
       const newEntities = this.state.entities;
       newEntities.push(newEntity);
@@ -288,6 +303,7 @@ class App extends Component {
               key={entity.keyValue}
               keyValue={entity.keyValue}
               id={entity.id}
+              ref={entity.reference}
               mouse={this.state.mouse}
               backgroundColor={entity.backgroundColor}
               current_zIndex={this.state.current_zIndex + index}

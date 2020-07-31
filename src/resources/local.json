@@ -30,7 +30,7 @@
       "icon": "angle_ico.svg",
       "backgroundColor": "blued",
       "parents": [1, 2],
-      "discovered": false
+      "discovered": true
     }
   ]
 }

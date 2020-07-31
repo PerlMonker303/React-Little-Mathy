@@ -1,6 +1,10 @@
+import { createRef } from "react";
 import { ENTITIES_OUTER_PADDING } from "../../resources/properties";
-import Data from "../../resources/local.json";
 import { discoverEntity } from "../localDataUtils";
+
+import EntitiesRepository from "../repositories/EntitiesRepository";
+
+const entitiesRepository = new EntitiesRepository();
 
 export const createEntity = (baseEntity, keyValue, posX, posY) => {
   return {
@@ -13,6 +17,7 @@ export const createEntity = (baseEntity, keyValue, posX, posY) => {
     },
     isHighlighted: false,
     icon: baseEntity.icon,
+    reference: createRef(),
   };
 };
 
@@ -47,39 +52,44 @@ export const combineEntities = (entities, entity1, entity2, keyValue) => {
         entity1 - the first entity to be combined
         entity2 - the second entity to be combined 
         keyValue - the value of the new key
-    Output: true if combined, false otherwise*/
+    Output: nr of children obtained*/
 
   //first check here if the two entities can be combined
-  const childEntity = searchChildEntity(entity1.id, entity2.id);
-  console.log("[CHILD]", childEntity);
-  if (childEntity !== null) {
+  const childEntities = searchChildEntities(entity1.id, entity2.id);
+
+  if (childEntities.length > 0) {
     let copy_entities = entities;
+    //remove parents
     const idx1 = copy_entities.indexOf(entity1);
-    const coordOfEntity1 = copy_entities[idx1].coordinates;
+    let coordOfEntity1 = copy_entities[idx1].coordinates;
     copy_entities.splice(idx1, 1);
     const idx2 = copy_entities.indexOf(entity2);
     copy_entities.splice(idx2, 1);
 
-    //add new entity
-    const adaptedEntity = createEntity(childEntity, keyValue);
-    adaptedEntity.coordinates = coordOfEntity1;
-    copy_entities.push(adaptedEntity);
+    const spawn_offset = 35;
+    //add new entities
+    childEntities.forEach((childEntity, idx) => {
+      const adaptedEntity = createEntity(childEntity, keyValue++);
+      coordOfEntity1 = {
+        x: coordOfEntity1.x + idx * spawn_offset,
+        y: coordOfEntity1.y + idx * spawn_offset,
+      };
+      adaptedEntity.coordinates = coordOfEntity1;
+      //adaptedEntity.isHighlighted = false;
+      copy_entities.push(adaptedEntity);
 
-    //discover it
-    discoverNewEntity(adaptedEntity.id);
-
-    return true;
+      //discover it
+      discoverNewEntity(adaptedEntity.id);
+    });
   }
-  return false;
+  return childEntities.length;
 };
 
 const discoverNewEntity = (newEntityId) => {
-  for (let i = 0; i < Data.entities.length; i++) {
-    if (
-      Data.entities[i].id === newEntityId &&
-      Data.entities[i].discovered === false
-    ) {
-      console.log("DISCOVERED ", JSON.stringify(Data.entities[i]));
+  const entities = entitiesRepository.getData();
+  for (let i = 0; i < entities.length; i++) {
+    if (entities[i].id === newEntityId && entities[i].discovered === false) {
+      console.log("DISCOVERED ", JSON.stringify(entities[i]));
       discoverEntity(i);
       return;
     }
@@ -104,20 +114,19 @@ export const calculateCurrentCoordinate = (state, type) => {
   }
 };
 
-export const searchChildEntity = (entity1Id, entity2Id) => {
-  /*Searches for the child between two entities
+export const searchChildEntities = (entity1Id, entity2Id) => {
+  /*Searches for the children between two entities
   Input: entity1Id, entity2Id - the IDs of the two entities
-  Output: the child entity or null if not found */
-  let foundObj = null;
-  Data.entities.forEach((entity, idx) => {
-    if (foundObj === null) {
-      if (
-        (entity.parents[0] === entity1Id && entity.parents[1] === entity2Id) ||
-        (entity.parents[0] === entity2Id && entity.parents[1] === entity1Id)
-      ) {
-        foundObj = JSON.parse(JSON.stringify(Data.entities[idx]));
-      }
+  Output: list of children entities */
+  let foundChildren = [];
+  const entities = entitiesRepository.getData();
+  entities.forEach((entity, idx) => {
+    if (
+      (entity.parents[0] === entity1Id && entity.parents[1] === entity2Id) ||
+      (entity.parents[0] === entity2Id && entity.parents[1] === entity1Id)
+    ) {
+      foundChildren.push(JSON.parse(JSON.stringify(entities[idx])));
     }
   });
-  return foundObj;
+  return foundChildren;
 };

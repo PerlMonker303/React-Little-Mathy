@@ -100,6 +100,27 @@ class Entity extends Component {
     }
   };
 
+  updateCoordinates = (offsetX, offsetY) => {
+    this.setState((prevProps, prevState) => {
+      return {
+        ...prevState,
+        coordinates: {
+          x: prevState.coordinates.x + offsetX,
+          y: prevState.coordinates.y + offsetY,
+        },
+      };
+    });
+  };
+
+  updateIsHighlighted = (set) => {
+    this.setState((prevProps, prevState) => {
+      return {
+        ...prevState,
+        isHighlighted: set,
+      };
+    });
+  };
+
   render() {
     const currentX = calculateCurrentCoordinate(this.state, "X");
     const currentY = calculateCurrentCoordinate(this.state, "Y");
