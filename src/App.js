@@ -12,7 +12,7 @@ import {
   COLLISION_DRAGGED,
   COLLISION_MENU,
   COLLISION_OVER_MENU,
-  COLLISION_REPULSION_OFFSET,
+  //COLLISION_REPULSION_OFFSET,
 } from "./resources/properties";
 
 import {

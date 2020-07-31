@@ -5,7 +5,7 @@
       "name": "point",
       "icon": "point_ico.svg",
       "backgroundColor": "redd",
-      "parents": [null, null],
+      "parents": [[null, null]],
       "discovered": true
     },
     {
@@ -13,7 +13,7 @@
       "name": "segment",
       "icon": "segment_ico.svg",
       "backgroundColor": "greend",
-      "parents": [1, 1],
+      "parents": [[1, 1]],
       "discovered": true
     },
     {
@@ -21,7 +21,7 @@
       "name": "line",
       "icon": "line_ico.svg",
       "backgroundColor": "blued",
-      "parents": [1, 1],
+      "parents": [[1, 1]],
       "discovered": true
     },
     {
@@ -29,7 +29,93 @@
       "name": "angle",
       "icon": "angle_ico.svg",
       "backgroundColor": "blued",
-      "parents": [1, 2],
+      "parents": [
+        [2, 2],
+        [3, 3]
+      ],
+      "discovered": true
+    },
+    {
+      "id": 5,
+      "name": "slope",
+      "icon": "slope_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[-1, -1]],
+      "discovered": true
+    },
+    {
+      "id": 6,
+      "name": "area",
+      "icon": "area_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [
+        [2, 2],
+        [3, 3]
+      ],
+      "discovered": true
+    },
+    {
+      "id": 7,
+      "name": "volume",
+      "icon": "volume_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [
+        [2, 6],
+        [3, 6]
+      ],
+      "discovered": true
+    },
+    {
+      "id": 8,
+      "name": "triangle",
+      "icon": "triangle_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [
+        [1, 2],
+        [1, 3],
+        [2, 4],
+        [3, 4]
+      ],
+      "discovered": true
+    },
+    {
+      "id": 9,
+      "name": "circle",
+      "icon": "circle_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[4, 10]],
+      "discovered": true
+    },
+    {
+      "id": 10,
+      "name": "ellipse",
+      "icon": "ellipse_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[11, 11]],
+      "discovered": true
+    },
+    {
+      "id": 11,
+      "name": "curve",
+      "icon": "curve_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[1, 12]],
+      "discovered": true
+    },
+    {
+      "id": 12,
+      "name": "time",
+      "icon": "time_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[null, null]],
+      "discovered": true
+    },
+    {
+      "id": 13,
+      "name": "pentagon",
+      "icon": "pentagon_ico.svg",
+      "backgroundColor": "blued",
+      "parents": [[null, null]],
       "discovered": true
     }
   ]

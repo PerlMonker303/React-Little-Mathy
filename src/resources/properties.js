@@ -9,4 +9,4 @@ export const COLLISION_DRAGGED = "collision_dragged";
 export const COLLISION_MENU = "collision_menu";
 export const COLLISION_OVER_MENU = "collision_over_menu";
 
-export const COLLISION_REPULSION_OFFSET = 20;
+export const COLLISION_REPULSION_OFFSET = 35;

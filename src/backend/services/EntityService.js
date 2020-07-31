@@ -1,5 +1,8 @@
 import { createRef } from "react";
-import { ENTITIES_OUTER_PADDING } from "../../resources/properties";
+import {
+  ENTITIES_OUTER_PADDING,
+  COLLISION_REPULSION_OFFSET,
+} from "../../resources/properties";
 import { discoverEntity } from "../localDataUtils";
 
 import EntitiesRepository from "../repositories/EntitiesRepository";
@@ -66,13 +69,12 @@ export const combineEntities = (entities, entity1, entity2, keyValue) => {
     const idx2 = copy_entities.indexOf(entity2);
     copy_entities.splice(idx2, 1);
 
-    const spawn_offset = 35;
     //add new entities
     childEntities.forEach((childEntity, idx) => {
       const adaptedEntity = createEntity(childEntity, keyValue++);
       coordOfEntity1 = {
-        x: coordOfEntity1.x + idx * spawn_offset,
-        y: coordOfEntity1.y + idx * spawn_offset,
+        x: coordOfEntity1.x + idx * COLLISION_REPULSION_OFFSET,
+        y: coordOfEntity1.y + idx * COLLISION_REPULSION_OFFSET,
       };
       adaptedEntity.coordinates = coordOfEntity1;
       //adaptedEntity.isHighlighted = false;
@@ -121,12 +123,16 @@ export const searchChildEntities = (entity1Id, entity2Id) => {
   let foundChildren = [];
   const entities = entitiesRepository.getData();
   entities.forEach((entity, idx) => {
-    if (
-      (entity.parents[0] === entity1Id && entity.parents[1] === entity2Id) ||
-      (entity.parents[0] === entity2Id && entity.parents[1] === entity1Id)
-    ) {
-      foundChildren.push(JSON.parse(JSON.stringify(entities[idx])));
-    }
+    console.log("ENTITIES PARENTS: ", entity);
+    entity.parents.forEach((parentsPair) => {
+      console.log("PARENTS Pair: ", parentsPair);
+      if (
+        (parentsPair[0] === entity1Id && parentsPair[1] === entity2Id) ||
+        (parentsPair[0] === entity2Id && parentsPair[1] === entity1Id)
+      ) {
+        foundChildren.push(JSON.parse(JSON.stringify(entities[idx])));
+      }
+    });
   });
   return foundChildren;
 };

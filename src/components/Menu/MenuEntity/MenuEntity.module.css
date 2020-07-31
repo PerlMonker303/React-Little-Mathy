@@ -1,5 +1,5 @@
 .MenuEntity {
-  background-color: red;
+  background-color: #eee;
   display: block;
   margin-bottom: 3px;
   padding-left: 5px;
@@ -8,6 +8,7 @@
 
 .MenuEntity:hover {
   cursor: pointer;
+  background-color: #ddd;
 }
 
 .MenuEntity img {
